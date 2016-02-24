@@ -2,7 +2,7 @@ import qbs
 
 CppApplication {
     consoleApplication: true
-    files: ["main.cpp", "wiringPi/*"]
+    files: ["main.cpp", "wiringPi/*" ] //"gnublin/*"
 
     Depends { name: 'cpp' }
     cpp.includePaths: [ 'wiringPi' ]

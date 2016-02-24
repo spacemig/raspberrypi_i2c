@@ -61,13 +61,22 @@ Distributed as-is; no warranty is given.
 
 #include <iostream>
 #include <errno.h>
+#include <unistd.h>
+
 #include <wiringPiI2C.h>
+
+//#define BOARD RASPBERRY_PI
+//#include "gnublin/gnublin.h"
+// ERROR: //home/pi/test/pi_i2c: /usr/lib/arm-linux-gnueabihf/libstdc++.so.6: version `GLIBCXX_3.4.20' not found (required by //home/pi/test/pi_i2c
 
 using namespace std;
 
 int main() //int argc, char *argv[]
 {
     cout << "Hello I2C!" << endl;
+
+
+
 
     int fd, result;
 
@@ -76,29 +85,61 @@ int main() //int argc, char *argv[]
     //
     // It returns a standard file descriptor.
     //
-    fd = wiringPiI2CSetup(0x60);
+    fd = wiringPiI2CSetup(0x04);
 
     cout << "Init result: "<< fd << endl;
 
-    for(int i = 0; i < 0x0000ffff; i++)
-    {
-        // I tried using the "fast write" command, but couldn't get it to work.
-        // It's not entirely obvious what's happening behind the scenes as
-        // regards to endianness or length of data sent.  I think it's only
-        // sending one byte, when we really need two.
-        //
-        // So instead I'm doing a 16 bit register access.  It appears to
-        // properly handle the endianness, and the length is specified by the
-        // call.  The only question was the register address, which is the
-        // concatenation of the command (010x = write DAC output)
-        // and power down (x00x = power up) bits.
-        result = wiringPiI2CWriteReg16(fd, 0x40, (i & 0xfff) );
+    //result = wiringPiI2CWriteReg16(fd, 0x04, 11 );
+
+    for (int i=0; i <= 10; i++) {
+
+        result = wiringPiI2CWrite(fd, i );
 
         if(result == -1)
         {
             cout << "Error.  Errno is: " << errno << endl;
         }
+
+        usleep(10000);
     }
+
+    //    for(int i = 0; i < 0x0000ffff; i++)
+    //    {
+    //        // I tried using the "fast write" command, but couldn't get it to work.
+    //        // It's not entirely obvious what's happening behind the scenes as
+    //        // regards to endianness or length of data sent.  I think it's only
+    //        // sending one byte, when we really need two.
+    //        //
+    //        // So instead I'm doing a 16 bit register access.  It appears to
+    //        // properly handle the endianness, and the length is specified by the
+    //        // call.  The only question was the register address, which is the
+    //        // concatenation of the command (010x = write DAC output)
+    //        // and power down (x00x = power up) bits.
+    //        result = wiringPiI2CWriteReg16(fd, 0x40, (i & 0xfff) );
+
+    //        if(result == -1)
+    //        {
+    //            cout << "Error.  Errno is: " << errno << endl;
+    //        }
+    //    }
+
+
+
+    //    gnublin_i2c i2c;
+
+    //    i2c.setAddress(0x04); // set the address of the slave you want to read/write
+
+    //    unsigned char buffer[8];
+    //    char RxBuf[8];
+
+    //    buffer[0]=0x22;
+
+    //    //i2c.send()
+    //    //i2c.send(buffer,5);
+    //    i2c.send(0x04, buffer, 2);   //send 2 bytes from buffer to register-address 0x12
+
+    //i2c.receive(RxBuf, 3);       // read 3 bytes and store them in RxBuf
+    //i2c.receive(0x23, RxBuf, 3);  // read from  tegister-address 0x23 3 bytes and store them in RxBuf
 
     return 0;
 }
