@@ -1,5 +1,7 @@
 // Wire Slave Receiver
 #include <Wire.h>
+#include<stdlib.h>
+
 
 #define SLAVE_ADDRESS 0x04
 int number = 0;
@@ -19,10 +21,18 @@ void setup() {
     Serial.println("Ready!");
 }
 
+int voltage = 0;
+
 void loop() {
-    delay(1000);
+    delay(100);
 
     // send data every second
+    //Wire.beginTransmission(SLAVE_ADDRESS); // transmit to device #8
+    //Wire.write(14);
+    //Wire.endTransmission();    // stop transmitting
+    Serial.println(voltage);
+    voltage++;
+    
 }
 
 // function that executes whenever data is received from master
@@ -52,7 +62,16 @@ void receiveData(int byteCount){
   //Serial.println(x);         // print the integer
 }
 
+char outstr[15];
+String stringOne = "";
 // callback for sending data
 void sendData(){
-    Wire.write(number);
+    //Wire.write(voltage);
+    //Wire.write("volt,");
+    //Wire.write(voltage);
+    dtostrf(voltage,5,2,outstr);
+    stringOne = String("volt,") + outstr + String("\n");
+    stringOne.toCharArray(outstr,15);
+    Wire.write(outstr);
+    //Wire.write("\n");
 }
